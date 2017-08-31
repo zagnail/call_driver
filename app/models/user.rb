@@ -3,4 +3,6 @@ class User < ApplicationRecord
   validates :lastname, presence: true
   validates :email_address, presence: true, uniqueness: true
   validates :mobile_phone_number, presence: true, uniqueness: true
+
+  has_secure_password
 end

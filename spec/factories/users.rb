@@ -4,6 +4,7 @@ FactoryGirl.define do
     lastname "Zag"
     sequence(:email_address) { |n| "test-#{n}@test.com" }
     sequence(:mobile_phone_number) { |n| "+7999999999#{n}" }
+    password "12344321"
   end
 
   factory :driver, class: User do
@@ -11,5 +12,6 @@ FactoryGirl.define do
     lastname "Schumacher"
     email_address "schumacher@test.com"
     mobile_phone_number "+11111111111"
+    password "12344321"
   end
 end
