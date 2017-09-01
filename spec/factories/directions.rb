@@ -6,7 +6,7 @@ FactoryGirl.define do
     start_address "Levonaberezhnaya ul., 24, Meleuz, Respublika Bashkortostan, Russia, 453850"
     end_location "{lat: 52.7587305, lng: 55.81016750000001)"
     start_location "{lat: 52.9603094, lng: 55.919311}"
-    start_date "2017-08-31 14:41:43"
+    start_date DateTime.now.advance(hours: 1) 
     cost 50
     association :user, strategy: :build
   end

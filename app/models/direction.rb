@@ -1,6 +1,7 @@
 class Direction < ApplicationRecord
 
   belongs_to :user
+  has_many :journeys
 
   validates :distance, presence: true
   validates :duration, presence: true

@@ -24,4 +24,12 @@ RSpec.describe User do
     subject = FactoryGirl.create(:user, password: password)
     expect(subject.authenticate(password)).to eq subject
   end
+
+  it "can create a user without a password" do
+    expect{ FactoryGirl.create(:user) }.not_to raise_error
+  end
+
+  it { is_expected.to have_many :directions }
+
+  it { is_expected.to have_many :journeys }
 end

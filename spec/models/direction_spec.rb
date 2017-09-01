@@ -6,6 +6,10 @@ RSpec.describe Direction do
     end
   end
 
+  describe "relationships" do
+    it { is_expected.to have_many :journeys }
+  end
+
   describe "validations" do
     it "start_date is after todays date" do
       subject.start_date = DateTime.new(2017, 8, 30, 0, 0)
