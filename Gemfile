@@ -18,6 +18,7 @@ gem 'jsonapi-resources'
 # gem 'capistrano-rails', group: :development
 
 gem 'rack-cors'
+gem 'apitome'
 
 group :development, :test do
   gem 'byebug', platform: :mri
@@ -33,7 +34,6 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.6'
   gem 'factory_girl_rails'
   gem 'rspec_api_documentation', '5.0.0'
-  gem 'apitome'
 end
 
 group :test do
