@@ -64,18 +64,6 @@ RSpec.resource "Journeys" do
       }
     end
 
-    let "rating" do
-      5
-    end
-
-    let "review" do
-      "This driver is so amazing!!"
-    end
-
-    let "confirmed" do
-      true
-    end
-
     before do
       header "Authorization", "Bearer #{access_token.token}"
     end
