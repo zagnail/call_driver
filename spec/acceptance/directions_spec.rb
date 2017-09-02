@@ -1,7 +1,18 @@
 require "rspec_api_documentation_helper"
 
 RSpec.resource "Directions" do
+
   header "Content-Type", "application/vnd.api+json"
+  header "Authorized", "Bearer {access_token}"
+
+  let! :current_user do
+    FactoryGirl.create(:user)
+  end
+
+  let :access_token do
+    Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id)
+      
+  end
 
   shared_context "direction parameters" do
     parameter "type", <<~DESC, required: true
@@ -43,15 +54,11 @@ RSpec.resource "Directions" do
     parameter "cost", <<~DESC, scope: :attributes, required: true
       The cost of the direction.
     DESC
-
-    parameter "user", <<~DESC, scope: :relationships, required: true
-      The user of the direction.
-    DESC
   end
 
   shared_context "persisted direction" do
     let! :persisted_direction do
-      FactoryGirl.create(:direction)
+      FactoryGirl.create(:direction, user: current_user)
     end
 
     let :direction_id do
@@ -88,25 +95,17 @@ RSpec.resource "Directions" do
 
     let "start-date" do
       "2017-09-01 13:58:07"
+      DateTime.now.advance(hours: 1)
     end
 
     let "cost" do
       500
     end
 
-    let! :persisted_user do
-      FactoryGirl.create(:user)
+    before do
+      header "Authorization", "Bearer #{access_token.token}"
     end
 
-    let "user" do
-      {
-        data: {
-          id: persisted_user.id.to_s,
-          type: "users"
-        }
-      }
-    end
- 
     example_request "POST /v1/directions" do
       expect(status).to eq 201
     end
@@ -124,6 +123,10 @@ RSpec.resource "Directions" do
 
     let "cost" do
       1000
+    end
+    
+    before do
+      header "Authorization", "Bearer #{access_token.token}"
     end
 
     example_request "PATCH /v1/directions/:id" do
@@ -150,6 +153,10 @@ RSpec.resource "Directions" do
 
   delete "/v1/directions/:direction_id" do
     include_context "persisted direction"
+
+    before do
+      header "Authorization", "Bearer #{access_token.token}"
+    end
 
     example_request "DELETE /v1/directions/:id" do
       expect(status).to eq 204
