@@ -2,6 +2,15 @@ require "rspec_api_documentation_helper"
 
 RSpec.resource "Journeys" do
   header "Content-Type", "application/vnd.api+json"
+  header "Authorized", "Bearer {access_token}"
+
+  let! :current_user do
+    FactoryGirl.create(:driver)
+  end
+
+  let :access_token do
+    Doorkeeper::AccessToken.create!(resource_owner_id: current_user.id)
+  end
 
   shared_context "journey parameters" do
     parameter "type", <<~DESC, required: true
@@ -14,10 +23,6 @@ RSpec.resource "Journeys" do
 
     parameter "direction", <<~DESC, scope: :relationships, required: true
       The direction of the journey.
-    DESC
-
-    parameter "user", <<~DESC, scope: :relationships, required: true
-      The driver of the journey.
     DESC
 
     parameter "rating", <<~DESC, scope: :attributes
@@ -35,7 +40,7 @@ RSpec.resource "Journeys" do
 
   shared_context "persisted journey" do
     let! :persisted_journey do
-      FactoryGirl.create(:journey)
+      FactoryGirl.create(:journey, user: current_user)
     end
 
     let :journey_id do
@@ -59,19 +64,6 @@ RSpec.resource "Journeys" do
       }
     end
 
-    let! :persisted_user do
-      FactoryGirl.create(:driver)
-    end
-
-    let "user" do
-      {
-        data: {
-          id: persisted_user.id.to_s,
-          type: "users"
-        }
-      }
-    end
-
     let "rating" do
       5
     end
@@ -82,6 +74,10 @@ RSpec.resource "Journeys" do
 
     let "confirmed" do
       true
+    end
+
+    before do
+      header "Authorization", "Bearer #{access_token.token}"
     end
 
     example_request "POST /v1/journeys" do
@@ -108,6 +104,10 @@ RSpec.resource "Journeys" do
       "This driver is bad to drive!!"
     end
 
+    before do
+      header "Authorization", "Bearer #{access_token.token}"
+    end
+
     example_request "PATCH /v1/journeys/:id" do
       expect(status).to eq 200
       expect(JSON.parse(response_body)["data"]["attributes"]["rating"]).to eq rating
@@ -132,6 +132,10 @@ RSpec.resource "Journeys" do
 
   delete "/v1/journeys/:journey_id" do
     include_context "persisted journey"
+
+    before do
+      header "Authorization", "Bearer #{access_token.token}"
+    end
 
     example_request "DELETE /v1/journeys/:id" do
       expect(status).to eq 204

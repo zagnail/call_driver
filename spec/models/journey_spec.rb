@@ -17,6 +17,14 @@ RSpec.describe Journey do
     it { is_expected.to validate_presence_of :user }
 
     it { is_expected.to validate_presence_of :direction }
+
+    it "direction user should not be equal to current user" do
+      subject = FactoryGirl.create(:journey)
+      user = subject.direction.user
+      subject.user = user
+      subject.valid?
+      expect(subject.errors[:user]).to include "should not be equal to direction user"
+    end
   end
 
   it "has a valid factory" do
